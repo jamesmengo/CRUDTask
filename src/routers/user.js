@@ -37,7 +37,17 @@ router.post('/users/logout', auth, async (req, res) => {
       return token.token !== req.token
     })
     await req.user.save()
-    res.send()
+    res.send('User logged out')
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
+
+router.post('/users/logoutAll', auth, async (req, res) => {
+  try {
+    req.user.token = []
+    await req.user.save()
+    res.send('User logged out of all devices')
   } catch (err) {
     res.status(500).send(err)
   }
