@@ -2,8 +2,21 @@ const express = require('express')
 const router = new express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
+const multer = require('multer')
+const upload = multer({
+  dest: 'avatars',
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      cb(new Error('Please upload an image in JPEG or PNG'))
+    }
+    cb(undefined, true)
+  }
+})
 
-// User Endpoints
+// CREATE Endpoints
 router.post("/users", async (req, res) => {
   const user = new User(req.body)
   try {
@@ -53,10 +66,12 @@ router.post('/users/logoutAll', auth, async (req, res) => {
   }
 })
 
+// READ Endpoints
 router.get("/users/me", auth, async (req, res) => {
   res.send(req.user)
 })
 
+// UPDATE Endpoints
 router.patch('/users/me', auth, async (req, res) => {
   const updates = Object.keys(req.body)
   const allowedUpdates = ['name', 'email', 'password', 'age']
@@ -77,6 +92,11 @@ router.patch('/users/me', auth, async (req, res) => {
   }
 })
 
+router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+  res.send()
+})
+
+// DELETE Endpoints
 router.delete('/users/me', auth, async (req, res) => {
   try {
     await req.user.remove()
