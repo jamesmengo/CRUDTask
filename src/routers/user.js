@@ -80,6 +80,17 @@ router.patch('/users/me', auth, async (req, res) => {
   }
 })
 
+// DELETE Endpoints
+router.delete('/users/me', auth, async (req, res) => {
+  try {
+    await req.user.remove()
+    res.send()
+  } catch (err) {
+    res.status(500).send(err)
+  }
+})
+
+// AVATAR Endpoints
 const upload = multer({
   limits: {
     fileSize: 1000000
@@ -102,14 +113,17 @@ router.post('/users/me/avatar', auth, upload.single('avatar'), async (req, res) 
   })
 })
 
-
-// DELETE Endpoints
-router.delete('/users/me', auth, async (req, res) => {
+router.get('/users/:id/avatar', async (req, res) => {
   try {
-    await req.user.remove()
-    res.send()
-  } catch (err) {
-    res.status(500).send(err)
+    const user = await User.findById(req.params.id)
+    if (!user || !user.avatar) {
+      throw new Error('User or Avatar not found')
+    }
+
+    res.set('Content-Type', 'image/jpg')
+    res.send(user.avatar)
+  } catch (e) {
+    res.status(404).send(e)
   }
 })
 
