@@ -3,18 +3,6 @@ const router = new express.Router()
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const multer = require('multer')
-const upload = multer({
-  dest: 'avatars',
-  limits: {
-    fileSize: 1000000
-  },
-  fileFilter(req, file, cb) {
-    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
-      cb(new Error('Please upload an image in JPEG or PNG'))
-    }
-    cb(undefined, true)
-  }
-})
 
 // CREATE Endpoints
 router.post("/users", async (req, res) => {
@@ -92,9 +80,27 @@ router.patch('/users/me', auth, async (req, res) => {
   }
 })
 
+const upload = multer({
+  dest: 'avatars',
+  limits: {
+    fileSize: 1000000
+  },
+  fileFilter(req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+      return cb(new Error('Please upload an image in JPEG or PNG'))
+    }
+    cb(undefined, true)
+  }
+})
+
 router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
   res.send()
+}, (error, req, res, next) => {
+  res.status(400).send({
+    error: error.message
+  })
 })
+
 
 // DELETE Endpoints
 router.delete('/users/me', auth, async (req, res) => {
