@@ -4,7 +4,7 @@ const User = require('../models/user')
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '')
-    const decoded = jwt.verify(token, 'taskApp')
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
     const user = await User.findOne({
       _id: decoded._id, //find user
       'tokens.token': token //verify that token is still stored
