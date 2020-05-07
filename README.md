@@ -7,3 +7,5 @@ Additional Features:
 - Image and file uploads
 - Input validation
 - Account registration + deletion emails
+- Unit Tests
+- Tested in Postman
